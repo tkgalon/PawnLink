@@ -40,6 +40,55 @@ def test_ip_url_has_no_tld():
     assert f["subdomain_count"] == 0
 
 
+@pytest.mark.parametrize(
+    ("url", "has_ext", "suspicious"),
+    [
+        ("http://evil.xyz/payload.EXE", 1, 1),
+        ("http://1.2.3.4/bins/mirai.arm7", 1, 1),
+        ("https://example.com/docs/index.html", 1, 0),
+        ("https://example.com/", 0, 0),
+        ("https://example.com/setup.exe?ref=mail", 1, 1),
+    ],
+)
+def test_file_extension(url, has_ext, suspicious):
+    f = extract_features(url)
+    assert f["has_file_extension"] == has_ext
+    assert f["has_suspicious_extension"] == suspicious
+
+
+@pytest.mark.parametrize(
+    "url",
+    [
+        "http://http://69.165.65.90/bins/x.sh",  # repeated scheme
+        "http://[abc/x",  # urlsplit raises ValueError
+        "http://",  # no host
+        "http://intranet/login",  # dotless host
+    ],
+)
+def test_malformed_urls_are_flagged_not_crashing(url):
+    assert extract_features(url)["is_malformed"] == 1
+
+
+@pytest.mark.parametrize(
+    "url", ["https://example.com/", "http://116.53.34.145/i", "localhost:8000/x"]
+)
+def test_wellformed_urls_are_not_flagged(url):
+    assert extract_features(url)["is_malformed"] == 0
+
+
+def test_character_stats():
+    f = extract_features("aab1%20")  # 3 alpha, 3 digits, 1 special, 6 unique
+    assert f["pct_alpha"] == pytest.approx(3 / 7)
+    assert f["num_special"] == 1
+    assert f["num_percent_encoded"] == 1
+    assert f["unique_char_ratio"] == pytest.approx(6 / 7)
+
+
+def test_all_features_are_numeric():
+    f = extract_features("https://www.example.com/a?b=c")
+    assert all(isinstance(v, (int, float)) for v in f.values())
+
+
 def test_empty_url_does_not_crash():
     f = extract_features("")
     assert f["url_length"] == 0
