@@ -1,0 +1,25 @@
+# Python environment & cache (can be recreated with `uv sync`)
+.venv/
+__pycache__/
+*.py[cod]
+
+# Tool caches
+.pytest_cache/
+.ruff_cache/
+
+# Data & models: downloaded via script / stored in MLflow or Cloud Storage
+data/*
+!data/README.md
+models/
+mlruns/
+mlartifacts/
+*.pkl
+*.joblib
+
+# Secrets
+.env
+*.json.key
+
+# Notebooks checkpoints & OS junk
+.ipynb_checkpoints/
+.DS_Store
