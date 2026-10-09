@@ -26,6 +26,20 @@ def test_ip_url_with_port():
     assert f["host_length"] == len("116.53.34.145")
 
 
+def test_multi_part_tld():
+    f = extract_features("https://login.secure.paypal.co.uk/")
+    assert f["tld_length"] == len("co.uk")
+    assert f["domain_length"] == len("paypal")
+    assert f["subdomain_count"] == 2
+    assert f["is_popular_tld"] == 0
+
+
+def test_ip_url_has_no_tld():
+    f = extract_features("http://116.53.34.145:34075/i")
+    assert f["tld_length"] == 0
+    assert f["subdomain_count"] == 0
+
+
 def test_empty_url_does_not_crash():
     f = extract_features("")
     assert f["url_length"] == 0

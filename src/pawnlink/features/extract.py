@@ -9,6 +9,17 @@ import math
 from collections import Counter
 from urllib.parse import urlsplit
 
+import tldextract
+
+# Use the Public Suffix List bundled with the installed tldextract version
+# instead of downloading the latest one, so features are identical in
+# training, CI, and serving, and no network call happens per process.
+_tld_extract = tldextract.TLDExtract(suffix_list_urls=())
+
+POPULAR_TLDS = frozenset(
+    {"com", "org", "net", "edu", "gov", "io", "co", "uk", "de", "jp", "id", "co.id"}
+)
+
 
 def _split(url: str):
     """Parse a URL, assuming http:// when the scheme is missing."""
@@ -37,6 +48,7 @@ def extract_features(url: str) -> dict[str, float]:
     url = url.strip()
     parts = _split(url)
     host = parts.hostname or ""
+    domain = _tld_extract(host)
 
     num_digits = sum(ch.isdigit() for ch in url)
     return {
@@ -51,4 +63,8 @@ def extract_features(url: str) -> dict[str, float]:
         "path_length": len(parts.path),
         "num_query_params": len([p for p in parts.query.split("&") if p]),
         "has_hyphen_in_host": int("-" in host),
+        "domain_length": len(domain.domain),
+        "tld_length": len(domain.suffix),
+        "subdomain_count": len(domain.subdomain.split(".")) if domain.subdomain else 0,
+        "is_popular_tld": int(domain.suffix in POPULAR_TLDS),
     }
