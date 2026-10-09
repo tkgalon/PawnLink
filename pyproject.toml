@@ -8,8 +8,10 @@ authors = [
 ]
 requires-python = ">=3.11"
 dependencies = [
+    "fastapi>=0.143.0",
     "lightgbm>=4.7.0",
     "tldextract>=5.4.0",
+    "uvicorn[standard]>=0.54.0",
 ]
 
 [project.scripts]
@@ -21,6 +23,7 @@ build-backend = "uv_build"
 
 [dependency-groups]
 dev = [
+    "httpx2>=2.13.1",
     "pytest>=9.1.1",
 ]
 train = [
@@ -28,3 +31,7 @@ train = [
     "pandas>=3.0.6",
     "scikit-learn>=1.9.1",
 ]
+
+[tool.uv]
+# Local dev needs the training stack too; the API image installs neither group.
+default-groups = ["dev", "train"]
