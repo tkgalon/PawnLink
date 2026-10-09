@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PawnLink</title>
+</head>
+<body>
+  <h1>PawnLink</h1>
+  <p>Paste a link. Pawn it.</p>
+
+  <form id="form">
+    <input id="url" type="text" size="60" placeholder="https://example.com/login" required>
+    <button type="submit">Pawn it</button>
+  </form>
+
+  <pre id="result"></pre>
+  <p><a href="/docs">API docs</a></p>
+
+  <script>
+    const form = document.getElementById("form");
+    const result = document.getElementById("result");
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      result.textContent = "...";
+      const resp = await fetch("/predict", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: document.getElementById("url").value }),
+      });
+      const body = await resp.json();
+      if (!resp.ok) {
+        result.textContent = `Error ${resp.status}\n` + JSON.stringify(body, null, 2);
+        return;
+      }
+      result.textContent =
+        `${body.is_phishing ? "PHISHING" : "LOOKS SAFE"}\n\n` +
+        `score:         ${body.score.toFixed(4)}\n` +
+        `model version: ${body.model_version}\n` +
+        `latency:       ${body.latency_ms.toFixed(2)} ms`;
+    });
+  </script>
+</body>
+</html>

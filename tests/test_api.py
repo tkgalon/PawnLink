@@ -35,6 +35,13 @@ def client(tmp_path, monkeypatch):
         yield c
 
 
+def test_demo_page(client):
+    resp = client.get("/")
+    assert resp.status_code == 200
+    assert "text/html" in resp.headers["content-type"]
+    assert "Pawn it" in resp.text
+
+
 def test_health(client):
     assert client.get("/health").json() == {"status": "ok", "model_version": "test"}
 

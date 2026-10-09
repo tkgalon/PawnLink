@@ -10,11 +10,13 @@ from pathlib import Path
 from typing import Annotated
 
 from fastapi import FastAPI, Request
+from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field, StringConstraints
 
 from pawnlink.api.model import PhishingModel
 
 MAX_BATCH = 100
+DEMO_PAGE = (Path(__file__).parent / "static" / "index.html").read_text()
 
 Url = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=2048)]
 
@@ -58,6 +60,11 @@ def _predict(model: PhishingModel, urls: list[str]) -> list[Prediction]:
         Prediction(url=u, score=s, is_phishing=s >= model.threshold)
         for u, s in zip(urls, model.score(urls))
     ]
+
+
+@app.get("/", response_class=HTMLResponse, include_in_schema=False)
+def demo() -> str:
+    return DEMO_PAGE
 
 
 @app.get("/health")
