@@ -13,6 +13,7 @@ data/*
 models/
 mlruns/
 mlartifacts/
+mlflow.db
 *.pkl
 *.joblib
 

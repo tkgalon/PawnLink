@@ -119,3 +119,7 @@ def extract_features(url: str) -> dict[str, float]:
         "has_file_extension": int(bool(extension)),
         "has_suspicious_extension": int(extension in SUSPICIOUS_EXTENSIONS),
     }
+
+
+# Column order of the model's input; training and serving must both use it.
+FEATURE_NAMES: tuple[str, ...] = tuple(extract_features(""))
