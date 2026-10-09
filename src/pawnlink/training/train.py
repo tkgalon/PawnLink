@@ -13,7 +13,8 @@ from pathlib import Path
 import lightgbm as lgb
 import mlflow
 import pandas as pd
-from sklearn.metrics import roc_auc_score
+import numpy as np
+from sklearn.metrics import precision_recall_curve, precision_score, recall_score, roc_auc_score
 
 from pawnlink.features.extract import FEATURE_NAMES, extract_features
 
@@ -55,6 +56,12 @@ def to_matrix(urls: pd.Series) -> pd.DataFrame:
 def load_split(name: str) -> tuple[pd.DataFrame, pd.Series]:
     df = pd.read_csv(PROCESSED_DIR / f"{name}.csv")
     return to_matrix(df["url"]), df["is_phishing"]
+
+
+def best_f1_threshold(y_true: pd.Series, scores: np.ndarray) -> float:
+    precision, recall, thresholds = precision_recall_curve(y_true, scores)
+    f1 = 2 * precision * recall / np.clip(precision + recall, 1e-12, None)
+    return float(thresholds[np.argmax(f1[:-1])])
 
 
 def git_is_dirty() -> bool:
@@ -105,11 +112,20 @@ def main() -> None:
             callbacks=[lgb.early_stopping(EARLY_STOPPING_ROUNDS, verbose=False)],
         )
 
+        val_scores = booster.predict(X_val)
+        test_scores = booster.predict(X_test)
+        # Picked on val so the test numbers below stay honest.
+        threshold = best_f1_threshold(y_val, val_scores)
+        test_pred = (test_scores >= threshold).astype(int)
+
         metrics = {
             "best_iteration": booster.best_iteration,
             "train_auc": roc_auc_score(y_train, booster.predict(X_train)),
-            "val_auc": roc_auc_score(y_val, booster.predict(X_val)),
-            "test_auc": roc_auc_score(y_test, booster.predict(X_test)),
+            "val_auc": roc_auc_score(y_val, val_scores),
+            "test_auc": roc_auc_score(y_test, test_scores),
+            "threshold": threshold,
+            "test_precision": precision_score(y_test, test_pred),
+            "test_recall": recall_score(y_test, test_pred),
         }
         mlflow.log_metrics(metrics)
 

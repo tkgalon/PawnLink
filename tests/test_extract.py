@@ -1,6 +1,6 @@
 import pytest
 
-from pawnlink.features.extract import extract_features
+from pawnlink.features.extract import FEATURE_NAMES, extract_features
 
 
 def test_basic_url():
@@ -87,6 +87,10 @@ def test_character_stats():
 def test_all_features_are_numeric():
     f = extract_features("https://www.example.com/a?b=c")
     assert all(isinstance(v, (int, float)) for v in f.values())
+
+
+def test_feature_names_match_extract_output():
+    assert list(extract_features("https://a.com/x")) == list(FEATURE_NAMES)
 
 
 def test_empty_url_does_not_crash():
