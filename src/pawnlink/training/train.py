@@ -5,6 +5,9 @@ Prerequisite: uv run python -m pawnlink.training.data
 View runs:    uv run mlflow ui --backend-store-uri sqlite:///mlflow.db
 """
 
+import argparse
+import hashlib
+import subprocess
 from pathlib import Path
 
 import lightgbm as lgb
@@ -54,7 +57,31 @@ def load_split(name: str) -> tuple[pd.DataFrame, pd.Series]:
     return to_matrix(df["url"]), df["is_phishing"]
 
 
+def git_is_dirty() -> bool:
+    status = subprocess.run(
+        ["git", "status", "--porcelain"], capture_output=True, text=True, check=True
+    )
+    return bool(status.stdout.strip())
+
+
+def file_sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
 def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--allow-dirty", action="store_true", help="train even with uncommitted changes"
+    )
+    args = parser.parse_args()
+
+    # MLflow tags the run with the current commit, which is only true if the tree is clean.
+    dirty = git_is_dirty()
+    if dirty and not args.allow_dirty:
+        raise SystemExit(
+            "Uncommitted changes found. Commit first, or pass --allow-dirty for a throwaway run."
+        )
+
     X_train, y_train = load_split("train")
     X_val, y_val = load_split("val")
     X_test, y_test = load_split("test")
@@ -63,6 +90,11 @@ def main() -> None:
     mlflow.set_experiment(EXPERIMENT)
 
     with mlflow.start_run():
+        mlflow.set_tags(
+            {f"data.{name}.sha256": file_sha256(PROCESSED_DIR / f"{name}.csv")
+             for name in ("train", "val", "test")}
+            | {"git.dirty": str(dirty).lower()}
+        )  # fmt: skip
         mlflow.log_params(PARAMS | {"num_features": len(FEATURE_NAMES)})
 
         booster = lgb.train(
