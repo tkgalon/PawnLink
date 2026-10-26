@@ -25,6 +25,7 @@ build-backend = "uv_build"
 dev = [
     "httpx2>=2.13.1",
     "pytest>=9.1.1",
+    "ruff>=0.17.2",
 ]
 train = [
     "mlflow>=3.17.0",
@@ -35,3 +36,10 @@ train = [
 [tool.uv]
 # Local dev needs the training stack too; the API image installs neither group.
 default-groups = ["dev", "train"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM"]

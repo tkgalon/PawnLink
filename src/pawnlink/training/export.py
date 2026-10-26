@@ -30,7 +30,9 @@ def main() -> None:
     run = client.get_run(mv.run_id)
 
     if "threshold" not in run.data.metrics:
-        raise SystemExit(f"v{mv.version} has no threshold metric; retrain with the current train.py.")
+        raise SystemExit(
+            f"v{mv.version} has no threshold metric; retrain with the current train.py."
+        )
 
     booster = mlflow.lightgbm.load_model(f"models:/{MODEL_NAME}/{mv.version}")
     if booster.feature_name() != list(FEATURE_NAMES):

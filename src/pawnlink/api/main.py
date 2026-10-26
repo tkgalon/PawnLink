@@ -58,7 +58,7 @@ app = FastAPI(title="PawnLink", description="Paste a link. Pawn it.", lifespan=l
 def _predict(model: PhishingModel, urls: list[str]) -> list[Prediction]:
     return [
         Prediction(url=u, score=s, is_phishing=s >= model.threshold)
-        for u, s in zip(urls, model.score(urls))
+        for u, s in zip(urls, model.score(urls), strict=True)
     ]
 
 

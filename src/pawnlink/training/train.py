@@ -12,8 +12,8 @@ from pathlib import Path
 
 import lightgbm as lgb
 import mlflow
-import pandas as pd
 import numpy as np
+import pandas as pd
 from sklearn.metrics import precision_recall_curve, precision_score, recall_score, roc_auc_score
 
 from pawnlink.features.extract import FEATURE_NAMES, extract_features
@@ -135,7 +135,10 @@ def main() -> None:
         mlflow.log_table(importance, "feature_importance.json")
 
         sanity = pd.DataFrame(
-            {"url": SANITY_URLS, "phishing_score": booster.predict(to_matrix(pd.Series(SANITY_URLS)))}
+            {
+                "url": SANITY_URLS,
+                "phishing_score": booster.predict(to_matrix(pd.Series(SANITY_URLS))),
+            }
         )
         mlflow.log_table(sanity, "sanity_legit_urls.json")
 
