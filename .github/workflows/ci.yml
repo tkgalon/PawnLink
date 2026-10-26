@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.12.24"
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --frozen
+
+      - name: Lint
+        run: uv run ruff check .
+
+      - name: Check formatting
+        run: uv run ruff format --check .
+
+      - name: Test
+        run: uv run pytest -q
+
+  docker:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.12.24"
+          enable-cache: true
+
+      # models/ is gitignored; until the real model comes from GCS, build with a dummy.
+      - name: Create dummy model
+        run: uv run --frozen --no-default-groups python scripts/make_dummy_model.py models
+
+      - name: Build image
+        run: docker build -t pawnlink:ci .
+
+      - name: Smoke test
+        run: |
+          docker run -d --name api -p 8080:8080 pawnlink:ci
+          for i in $(seq 1 30); do
+            curl -sf http://127.0.0.1:8080/health && break
+            sleep 1
+          done
+          curl -sf http://127.0.0.1:8080/health
+          curl -sf -X POST http://127.0.0.1:8080/predict \
+            -H 'Content-Type: application/json' \
+            -d '{"url": "http://1.2.3.4/x.exe"}'
+
+      - name: Container logs
+        if: failure()
+        run: docker logs api
