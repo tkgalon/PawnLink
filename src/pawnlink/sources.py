@@ -4,6 +4,7 @@ import gzip
 import io
 import json
 import random
+import re
 import time
 import urllib.parse
 import urllib.request
@@ -32,14 +33,16 @@ def get(url: str, retries: int = 4, byte_range: tuple[int, int] | None = None) -
     headers = {"User-Agent": "pawnlink-research/0.1"}
     if byte_range:
         headers["Range"] = f"bytes={byte_range[0]}-{byte_range[0] + byte_range[1] - 1}"
+    error = None
     for attempt in range(retries):
         try:
             req = urllib.request.Request(url, headers=headers)
             with urllib.request.urlopen(req, timeout=60) as resp:
                 return resp.read()
-        except (urllib.error.URLError, TimeoutError):
+        except (urllib.error.URLError, TimeoutError) as e:
+            error = e
             time.sleep(5 * (attempt + 1))
-    raise RuntimeError(f"giving up on {url}")
+    raise RuntimeError(f"giving up on {url}: {error}")
 
 
 def openphish_urls() -> list[str]:
@@ -62,7 +65,9 @@ def tranco_domains(cache_dir: Path) -> tuple[str, list[str]]:
 
 
 def latest_crawl() -> str:
-    return json.loads(get("https://index.commoncrawl.org/collinfo.json"))[0]["id"]
+    # The CDN copy of the crawl list; index.commoncrawl.org refuses requests from Cloud Run.
+    page = get("https://data.commoncrawl.org/cc-index/collections/index.html").decode()
+    return max(re.findall(r"CC-MAIN-\d{4}-\d{2}", page))
 
 
 class ClusterIndex:
