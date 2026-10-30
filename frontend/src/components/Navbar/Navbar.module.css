@@ -1,0 +1,57 @@
+.header {
+  position: relative;
+  z-index: 2;
+  background: var(--cream);
+  border-bottom: var(--line) solid var(--ink);
+}
+
+.nav {
+  max-width: var(--page);
+  margin: 0 auto;
+  padding: 18px 24px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 28px;
+  letter-spacing: -0.01em;
+}
+
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 22px;
+  font-weight: 800;
+  font-size: 16px;
+}
+
+.link {
+  text-decoration: none;
+}
+
+.current {
+  text-decoration: underline;
+  text-decoration-thickness: 3px;
+  text-underline-offset: 6px;
+  text-decoration-color: var(--honey);
+}
+
+.github {
+  text-decoration: none;
+  background: var(--white);
+  border: 2.5px solid var(--ink);
+  border-radius: 14px;
+  padding: 8px 16px;
+  box-shadow: 0 4px 0 var(--ink);
+}
