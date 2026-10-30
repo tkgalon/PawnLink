@@ -1,4 +1,4 @@
-import { GITHUB_URL } from "../Navbar/Navbar";
+import { GITHUB_URL } from "@/components/Navbar/Navbar";
 import styles from "./Footer.module.css";
 
 export const MODEL_CARD_URL = `${GITHUB_URL}/blob/main/MODEL_CARD.md`;

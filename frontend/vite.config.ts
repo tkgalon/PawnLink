@@ -8,6 +8,7 @@ const api = "http://127.0.0.1:8080";
 
 export default defineConfig({
   plugins: [react()],
+  resolve: { alias: { "@": resolve(import.meta.dirname, "src") } },
   server: {
     port: 5173,
     proxy: { "/predict": api, "/api": api, "/health": api },
