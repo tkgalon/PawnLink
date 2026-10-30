@@ -1,0 +1,323 @@
+.hero {
+  background-color: var(--lime-board);
+  /* Two greens a few percent apart read as texture, not as a game board. */
+  background-image: repeating-conic-gradient(var(--lime-board-tone) 0 25%, var(--lime-board) 0 50%);
+  background-size: 128px 128px;
+  background-position: center top;
+}
+
+.inner {
+  max-width: var(--page);
+  margin: 0 auto;
+  padding: 40px 24px 56px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Bubble on the left, Pawny centred over the 170px button (he is 290px wide, so he overhangs by 60px). */
+.stage {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: flex-end;
+  gap: 12px 20px;
+  width: 100%;
+  max-width: 780px;
+}
+
+.bubble {
+  --bubble-fill: var(--cream);
+  flex: 0 1 400px;
+  margin-bottom: 160px;
+  position: relative;
+  background: var(--bubble-fill);
+  border: var(--line) solid var(--ink);
+  border-radius: 26px;
+  padding: 24px 26px;
+  box-shadow: 0 var(--lip) 0 var(--ink);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* The tail: an ink triangle with a smaller fill-coloured one on top. */
+.bubble::before,
+.bubble::after {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+.bubble::before {
+  right: -22px;
+  bottom: 36px;
+  border-top: 14px solid transparent;
+  border-bottom: 14px solid transparent;
+  border-left: 24px solid var(--ink);
+}
+.bubble::after {
+  right: -16px;
+  bottom: 39px;
+  border-top: 11px solid transparent;
+  border-bottom: 11px solid transparent;
+  border-left: 19px solid var(--bubble-fill);
+}
+
+.bubbleTitle {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 40px;
+  line-height: 1.04;
+}
+
+.bubbleBody {
+  margin: 0;
+  font-size: 17px;
+  line-height: 1.5;
+  font-weight: 600;
+}
+
+.pawny {
+  --slam-up: -22px;
+  --slam-down: 32px;
+  --slam-rebound: -4px;
+  margin-bottom: 10px;
+  margin-right: -60px;
+  position: relative;
+  z-index: 1;
+}
+
+.form {
+  width: 100%;
+  max-width: 780px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.field {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.input {
+  box-sizing: border-box;
+  flex: 999 1 360px;
+  min-width: 0;
+  height: 68px;
+  padding: 0 22px;
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--ink);
+  background: var(--white);
+  border: var(--line) solid var(--ink);
+  border-radius: 20px;
+  box-shadow: 0 6px 0 var(--ink);
+}
+
+.button {
+  flex: 0 0 170px;
+  height: 68px;
+  border: var(--line) solid var(--ink);
+  border-radius: 20px;
+  background: var(--blue);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 6px 0 var(--ink);
+}
+.button:disabled {
+  cursor: progress;
+}
+
+.tickets {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+  min-height: 39px;
+}
+
+.ticketsLabel {
+  font-weight: 800;
+  font-size: 15px;
+}
+
+.ticket {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-family: inherit;
+  color: var(--ink);
+  padding: 8px 14px 8px 10px;
+  border: 2.5px solid var(--ink);
+  border-radius: 6px 16px 16px 6px;
+  box-shadow: 0 3px 0 var(--ink);
+  background: var(--cream);
+}
+.ticket:disabled {
+  cursor: progress;
+}
+.picked {
+  background: var(--blue);
+}
+
+.dot {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--honey);
+  border: 2px solid var(--ink);
+}
+
+.ticketLabel {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.board {
+  height: 48px;
+  border-top: var(--line) solid var(--ink);
+  border-bottom: var(--line) solid var(--ink);
+  background: repeating-conic-gradient(var(--ink) 0 25%, var(--cream) 0 50%) 0 0 / 48px 48px;
+}
+
+/* Stacked hero up to 860px: below that the desktop overhang would push Pawny off screen. */
+@media (max-width: 860px) {
+  .hero {
+    background-size: 96px 96px;
+  }
+
+  .inner {
+    padding: 24px 16px 28px;
+  }
+
+  .stage {
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    max-width: 560px;
+  }
+
+  .bubble {
+    box-sizing: border-box;
+    flex: none;
+    width: 100%;
+    margin-bottom: 0;
+    border-radius: 24px;
+    padding: 18px 20px;
+  }
+  .bubble::before {
+    right: auto;
+    left: 50%;
+    bottom: -24px;
+    margin-left: -14px;
+    border-top: 24px solid var(--ink);
+    border-left: 14px solid transparent;
+    border-right: 14px solid transparent;
+    border-bottom: 0;
+  }
+  .bubble::after {
+    right: auto;
+    left: 50%;
+    bottom: -17px;
+    margin-left: -11px;
+    border-top: 19px solid var(--bubble-fill);
+    border-left: 11px solid transparent;
+    border-right: 11px solid transparent;
+    border-bottom: 0;
+  }
+
+  .bubbleTitle {
+    font-size: 30px;
+    line-height: 1.06;
+  }
+
+  .bubbleBody {
+    font-size: 16px;
+  }
+
+  .pawny {
+    --slam-up: -18px;
+    --slam-down: 24px;
+    --slam-rebound: -3px;
+    margin: 22px 0 8px;
+  }
+  .pawny svg {
+    width: 200px;
+    height: 240px;
+  }
+
+  .form {
+    max-width: 560px;
+  }
+
+  .field {
+    flex-direction: column;
+  }
+
+  .input {
+    flex: none;
+    width: 100%;
+    height: 58px;
+    padding: 0 18px;
+    /* 16px stops iOS from zooming the page when the field is focused. */
+    font-size: 16px;
+    border-radius: 18px;
+    box-shadow: 0 var(--lip) 0 var(--ink);
+  }
+
+  .button {
+    flex: none;
+    width: 100%;
+    height: 58px;
+    border-radius: 18px;
+    font-size: 22px;
+    box-shadow: 0 var(--lip) 0 var(--ink);
+  }
+
+  .tickets {
+    gap: 10px 8px;
+    margin-top: 4px;
+    padding-bottom: 4px;
+  }
+
+  .ticketsLabel {
+    flex-basis: 100%;
+    margin-bottom: 4px;
+    text-align: center;
+  }
+
+  .ticket {
+    flex: none;
+    gap: 6px;
+    padding: 6px 10px 6px 8px;
+  }
+  /* The longest ticket goes last so the two short ones share the first row. */
+  .long {
+    order: 1;
+  }
+
+  .dot {
+    width: 8px;
+    height: 8px;
+  }
+
+  .ticketLabel {
+    font-size: 12px;
+  }
+}

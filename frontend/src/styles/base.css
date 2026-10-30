@@ -1,15 +1,11 @@
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
+/* Boxes keep the browser default (content-box): widths and heights below are content sizes,
+   which is how the layout was measured. Elements that need border-box opt in. */
 
 body {
   margin: 0;
   background: var(--cream);
   color: var(--ink);
   font-family: var(--font-body);
-  -webkit-font-smoothing: antialiased;
 }
 
 a {
