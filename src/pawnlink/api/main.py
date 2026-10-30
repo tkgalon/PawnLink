@@ -1,8 +1,3 @@
-"""Usage: uv run uvicorn pawnlink.api.main:app --port 8080
-
-Set MODEL_DIR to load the model from somewhere other than ./models.
-"""
-
 import os
 import time
 from contextlib import asynccontextmanager
@@ -14,6 +9,7 @@ from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field, StringConstraints
 
 from pawnlink.api.model import PhishingModel
+from pawnlink.api.prediction_log import log_predictions
 
 MAX_BATCH = 100
 DEMO_PAGE = (Path(__file__).parent / "static" / "index.html").read_text()
@@ -77,6 +73,7 @@ def predict(body: PredictRequest, request: Request) -> PredictResponse:
     start = time.perf_counter()
     model = request.app.state.model
     [prediction] = _predict(model, [body.url])
+    log_predictions([prediction], model.version, "predict")
     return PredictResponse(
         **prediction.model_dump(),
         model_version=model.version,
@@ -88,8 +85,10 @@ def predict(body: PredictRequest, request: Request) -> PredictResponse:
 def predict_batch(body: BatchRequest, request: Request) -> BatchResponse:
     start = time.perf_counter()
     model = request.app.state.model
+    predictions = _predict(model, body.urls)
+    log_predictions(predictions, model.version, "batch")
     return BatchResponse(
-        predictions=_predict(model, body.urls),
+        predictions=predictions,
         model_version=model.version,
         latency_ms=(time.perf_counter() - start) * 1000,
     )

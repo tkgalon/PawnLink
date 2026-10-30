@@ -87,3 +87,34 @@ def test_load_rejects_model_with_other_features(tmp_path):
     _write_model(tmp_path, feature_names=[f"f{i}" for i in range(len(FEATURE_NAMES))])
     with pytest.raises(RuntimeError, match="re-export"):
         PhishingModel.load(tmp_path)
+
+
+def _logged(capsys):
+    lines = capsys.readouterr().out.splitlines()
+    return [json.loads(line) for line in lines if line.startswith("{")]
+
+
+def test_predict_logs_one_line(client, capsys):
+    capsys.readouterr()
+    body = client.post("/predict", json={"url": "https://example.com/a"}).json()
+    [record] = _logged(capsys)
+    assert record["event"] == "prediction"
+    assert record["endpoint"] == "predict"
+    assert record["url"] == "https://example.com/a"
+    assert record["score"] == body["score"]
+    assert record["model_version"] == "test"
+
+
+def test_batch_logs_one_line_per_url(client, capsys):
+    capsys.readouterr()
+    urls = ["https://a.com", "https://b.com", "https://c.com"]
+    client.post("/predict/batch", json={"urls": urls})
+    records = _logged(capsys)
+    assert [r["url"] for r in records] == urls
+    assert {r["endpoint"] for r in records} == {"batch"}
+
+
+def test_invalid_request_is_not_logged(client, capsys):
+    capsys.readouterr()
+    client.post("/predict", json={"url": ""})
+    assert _logged(capsys) == []
