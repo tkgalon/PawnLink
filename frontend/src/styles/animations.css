@@ -1,0 +1,60 @@
+/* Each animation marks a state change. */
+
+@keyframes pwbob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+@keyframes pwpop {
+  0% { transform: scale(0.92); }
+  60% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+@keyframes pwblink {
+  0%, 94%, 100% { transform: scaleY(1); }
+  97% { transform: scaleY(0.1); }
+}
+@keyframes pwscan {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(-6px, 4px); }
+}
+/* Pawny hops, drops onto the Pawn it button, and springs back. */
+@keyframes slam {
+  0% { transform: translateY(0); }
+  25% { transform: translateY(-22px); }
+  45% { transform: translateY(32px) scaleY(0.88); }
+  55% { transform: translateY(32px) scaleY(0.88); }
+  80% { transform: translateY(-4px) scaleY(1.02); }
+  100% { transform: none; }
+}
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-3px); }
+  50% { transform: translateX(3px); }
+  75% { transform: translateX(-2px); }
+}
+@keyframes bubblein {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes brickin {
+  from { transform: translateY(-10px); opacity: 0.3; }
+  to { transform: none; opacity: 1; }
+}
+
+.pw-bob { animation: pwbob 0.9s ease-in-out infinite; transform-origin: 120px 270px; }
+.pw-pop { animation: pwpop 0.5s cubic-bezier(0.3, 1.6, 0.5, 1); transform-origin: 120px 270px; }
+.pw-blink { animation: pwblink 4.5s infinite; transform-origin: 120px 86px; }
+.pw-scan { animation: pwscan 0.8s ease-in-out infinite; }
+.pw-slam { animation: slam 0.75s ease-in-out; transform-origin: 50% 100%; }
+.shake { animation: shake 0.28s ease-in-out 0.34s; }
+.bubble-in { animation: bubblein 0.35s ease-out; }
+.brick-in { animation: brickin 0.3s ease-out; }
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

@@ -31,3 +31,10 @@ Notebook_DSCO.ipynb
 # Generated drift reports (HTML, several MB each)
 reports/drift/
 reports/monthly/
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/tests/e2e/.results/
+frontend/tests/e2e/.captures/
+frontend/playwright-report/

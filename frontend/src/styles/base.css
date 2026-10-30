@@ -1,0 +1,47 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--cream);
+  color: var(--ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--ink);
+}
+a:hover {
+  color: #4b3f86;
+}
+
+/* Chunky elements sit on a solid lip and drop onto it when pressed. */
+.chunky {
+  transition:
+    transform 0.08s ease,
+    box-shadow 0.08s ease;
+}
+.chunky:active {
+  transform: translateY(var(--lip));
+  box-shadow: 0 0 0 transparent !important;
+}
+.chunky:focus-visible,
+button:focus-visible,
+a:focus-visible,
+input:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 3px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

@@ -1,0 +1,37 @@
+:root {
+  /* Palette: each color has one job (see the Identity artboard). */
+  --cream: #f9f8f3;
+  --lime: #97d65b;
+  --honey: #f7b951;
+  --coral: #ff8585;
+  --blue: #7cb5f8;
+  --ink: #2b2350;
+
+  --white: #ffffff;
+  --honey-deep: #d9962e;
+  --lime-board: #92d159;
+  --lime-board-tone: #8ccb53;
+  --muted-line: #b9b3cf;
+  --muted-text: #8a82a8;
+  --rule: #ece9f4;
+  --sky-tint: #cfe2fc;
+  --safe-tint: #eaf6dd;
+  --risk-tint: #ffe1e1;
+  --miss-tint: #fff3dc;
+
+  /* Bricks for the URL anatomy. */
+  --brick-scheme: #ffffff;
+  --brick-subdomain: #cfe2fc;
+  --brick-domain: #7cb5f8;
+  --brick-tld: #f7b951;
+  --brick-path: #ffc9c9;
+  --brick-query: #d7eec0;
+
+  --font-display: "Fredoka", system-ui, sans-serif;
+  --font-body: "Nunito", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  --line: 3px;
+  --lip: 5px;
+  --page: 1180px;
+}
