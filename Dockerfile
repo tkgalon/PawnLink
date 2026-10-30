@@ -8,13 +8,17 @@ ENV UV_COMPILE_BYTECODE=1 \
 
 WORKDIR /app
 
+# The API image installs no extra groups; the monthly job image passes
+# --build-arg UV_GROUPS="--group monitor" for Evidently and the GCP clients.
+ARG UV_GROUPS=""
+
 # Dependencies first so this layer is cached until uv.lock changes.
 COPY pyproject.toml uv.lock ./
-RUN uv sync --frozen --no-default-groups --no-install-project --no-editable
+RUN uv sync --frozen --no-default-groups $UV_GROUPS --no-install-project --no-editable
 
 COPY README.md ./
 COPY src ./src
-RUN uv sync --frozen --no-default-groups --no-editable
+RUN uv sync --frozen --no-default-groups $UV_GROUPS --no-editable
 
 
 # Runtime stage: only the virtualenv and the model, no uv, no source tree.

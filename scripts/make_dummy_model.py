@@ -1,9 +1,3 @@
-"""Usage: uv run python scripts/make_dummy_model.py models
-
-Writes a tiny random model with the real feature names, so CI can build and
-start the Docker image without the real model. Not for serving.
-"""
-
 import json
 import sys
 from pathlib import Path

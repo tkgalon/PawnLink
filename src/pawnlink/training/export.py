@@ -6,6 +6,7 @@ import mlflow
 from mlflow import MlflowClient
 
 from pawnlink.features.extract import FEATURE_NAMES
+from pawnlink.monitoring.drift import load_reference
 from pawnlink.training.train import MODEL_NAME, TRACKING_URI
 
 MODEL_DIR = Path("models")
@@ -45,6 +46,9 @@ def main() -> None:
         "feature_names": list(FEATURE_NAMES),
     }
     (MODEL_DIR / "metadata.json").write_text(json.dumps(metadata, indent=2) + "\n")
+    # Drift reports compare live traffic against what the model was trained on; the
+    # cloud has no train.csv, so a sample travels with the model.
+    (MODEL_DIR / "reference_urls.txt").write_text("\n".join(load_reference()) + "\n")
     print(f"Exported {MODEL_NAME} v{mv.version} to {MODEL_DIR}/")
 
 

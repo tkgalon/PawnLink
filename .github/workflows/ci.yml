@@ -17,6 +17,8 @@ env:
   REGION: us-central1
   SERVICE: pawnlink-api
   IMAGE: us-central1-docker.pkg.dev/pawnlink-tkgalon/pawnlink/api
+  JOB: pawnlink-monthly
+  JOB_IMAGE: us-central1-docker.pkg.dev/pawnlink-tkgalon/pawnlink/job
 
 jobs:
   test:
@@ -90,11 +92,14 @@ jobs:
           mkdir -p models
           gcloud storage cp "gs://pawnlink-tkgalon-models/pawnlink-lgbm/v$MODEL_VERSION/*" models/
 
-      - name: Build and push image
+      - name: Build and push images
         run: |
           gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
           docker build -t "$IMAGE:$GITHUB_SHA" .
+          docker build --build-arg UV_GROUPS="--group monitor" -t "$JOB_IMAGE:$GITHUB_SHA" .
+          docker run --rm "$JOB_IMAGE:$GITHUB_SHA" python -c "import pawnlink.monitoring.monthly"
           docker push "$IMAGE:$GITHUB_SHA"
+          docker push "$JOB_IMAGE:$GITHUB_SHA"
 
       # max-instances=1 caps the bill even under a traffic spike; min-instances=0 means
       # nothing runs (or costs) while nobody is calling the API.
@@ -116,3 +121,19 @@ jobs:
         run: |
           url=$(gcloud run services describe "$SERVICE" --region "$REGION" --format 'value(status.url)')
           scripts/smoke_test.sh "$url" "$MODEL_VERSION"
+
+      # Only updates the job definition; Cloud Scheduler runs it on the 1st of each month.
+      - name: Deploy monthly job
+        run: |
+          gcloud run jobs deploy "$JOB" \
+            --image "$JOB_IMAGE:$GITHUB_SHA" \
+            --project "$PROJECT_ID" \
+            --region "$REGION" \
+            --service-account "pawnlink-job@$PROJECT_ID.iam.gserviceaccount.com" \
+            --command python \
+            --args="-m,pawnlink.monitoring.monthly" \
+            --memory 2Gi \
+            --cpu 1 \
+            --task-timeout 30m \
+            --max-retries 1 \
+            --labels "app=pawnlink,commit=$GITHUB_SHA"

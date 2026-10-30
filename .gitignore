@@ -30,3 +30,4 @@ Notebook_DSCO.ipynb
 
 # Generated drift reports (HTML, several MB each)
 reports/drift/
+reports/monthly/

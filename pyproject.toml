@@ -30,6 +30,7 @@ dev = [
 monitor = [
     "evidently>=0.7.23",
     "google-cloud-bigquery>=3.47.0",
+    "google-cloud-storage>=3.17.1",
 ]
 train = [
     "mlflow>=3.17.0",

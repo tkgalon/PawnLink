@@ -1,9 +1,3 @@
-"""Compare our recomputed features with the precomputed dataset columns.
-
-Run with: uv run python scripts/compare_features.py
-Writes reports/feature_comparison.md.
-"""
-
 from pathlib import Path
 
 import pandas as pd

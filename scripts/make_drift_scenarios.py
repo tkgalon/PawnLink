@@ -1,11 +1,3 @@
-"""Usage: uv run python scripts/make_drift_scenarios.py
-
-Writes two URL lists for trying the drift report:
-  data/simulated/normal.txt   URLs from the test split, same world as training
-  shifted.txt                 legit domains from the test split with realistic paths,
-                              the kind of traffic the training data barely has
-"""
-
 from pathlib import Path
 
 import numpy as np
