@@ -1,0 +1,423 @@
+.card {
+  margin-top: 40px;
+  background: var(--white);
+  border: var(--line) solid var(--ink);
+  border-radius: 28px;
+  padding: 36px 36px 40px;
+  box-shadow: 0 6px 0 var(--ink);
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.heading {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 26px;
+}
+
+.read {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.bricks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.brickSlot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.loupe {
+  width: 26px;
+  height: 26px;
+  color: var(--ink);
+}
+
+.loupeSpace {
+  display: block;
+  height: 26px;
+}
+
+.brick {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 20px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  border: var(--line) dashed var(--muted-line);
+  color: var(--muted-text);
+  white-space: pre;
+}
+
+.lit {
+  border-style: solid;
+  border-color: var(--ink);
+  color: var(--ink);
+  box-shadow: 0 4px 0 var(--ink);
+}
+
+.kind {
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.verdict {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 48px;
+}
+
+.meterColumn {
+  flex: 1 1 380px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.tugColumn {
+  flex: 1 1 420px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.scoreRow {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.score {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 72px;
+  line-height: 1;
+}
+
+.badge {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 22px;
+  padding: 6px 16px;
+  border: var(--line) solid var(--ink);
+  border-radius: 999px;
+}
+.risky {
+  background: var(--coral);
+}
+.safe {
+  background: var(--lime);
+}
+
+.meter {
+  position: relative;
+  padding-top: 34px;
+}
+
+.needle {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.pin {
+  background: var(--ink);
+  color: var(--cream);
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 13px;
+  padding: 3px 8px;
+  border-radius: 8px;
+}
+
+.pinTip {
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 10px solid var(--ink);
+}
+
+.track {
+  display: flex;
+  height: 30px;
+  border: var(--line) solid var(--ink);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 0 var(--ink);
+}
+
+.safeZone {
+  background: var(--lime);
+}
+
+.riskZone {
+  flex: 1;
+  background: var(--coral);
+  border-left: var(--line) solid var(--ink);
+}
+
+.scale {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 800;
+  margin-top: 12px;
+}
+
+.flag {
+  position: absolute;
+  transform: translateX(-50%);
+}
+
+.url {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 15px;
+  font-weight: 500;
+  word-break: break-all;
+}
+
+.miss {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  background: var(--miss-tint);
+  border: var(--line) solid var(--ink);
+  border-radius: 20px;
+  padding: 14px 18px;
+}
+.miss p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.5;
+  font-weight: 600;
+}
+
+.missPawny {
+  flex: none;
+}
+
+.legend {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 15px;
+}
+.legend span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.safeKey,
+.riskKey {
+  width: 14px;
+  height: 14px;
+  border-radius: 5px;
+  border: 2px solid var(--ink);
+}
+.safeKey {
+  background: var(--lime);
+}
+.riskKey {
+  background: var(--coral);
+}
+
+.tug {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  position: relative;
+}
+
+/* One honey rope down the middle; on phones it moves into each row so it never crosses a label. */
+.tug::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -6px;
+  bottom: -6px;
+  width: 4px;
+  margin-left: -2px;
+  background: var(--honey);
+  border-radius: 2px;
+}
+
+.reason {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.labelSafe,
+.labelRisk {
+  font-weight: 800;
+  font-size: 15px;
+}
+.labelSafe {
+  text-align: left;
+}
+.labelRisk {
+  text-align: right;
+}
+
+.bars {
+  display: flex;
+  height: 22px;
+  position: relative;
+}
+
+.half {
+  flex: 1;
+  display: flex;
+}
+
+.rope {
+  display: none;
+}
+
+.bar {
+  box-sizing: border-box;
+  height: 22px;
+  border: var(--line) solid var(--ink);
+}
+.barSafe {
+  background: var(--lime);
+  border-radius: 12px 0 0 12px;
+}
+.barRisk {
+  background: var(--coral);
+  border-radius: 0 12px 12px 0;
+}
+
+.note {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  .card {
+    margin-top: 28px;
+    border-radius: 24px;
+    padding: 22px 18px 26px;
+    gap: 30px;
+  }
+
+  .heading {
+    font-size: 22px;
+  }
+
+  .read {
+    gap: 12px;
+  }
+
+  .bricks {
+    gap: 6px;
+  }
+
+  .brickSlot {
+    gap: 6px;
+  }
+
+  .loupe,
+  .loupeSpace {
+    width: 22px;
+    height: 22px;
+  }
+
+  .brick {
+    font-size: 16px;
+    padding: 8px 11px;
+    border-radius: 12px;
+  }
+
+  .kind {
+    font-size: 12px;
+  }
+
+  .verdict {
+    flex-direction: column;
+    gap: 34px;
+  }
+
+  .meterColumn,
+  .tugColumn {
+    flex: none;
+    gap: 16px;
+  }
+
+  .scoreRow {
+    gap: 12px;
+  }
+
+  .score {
+    font-size: 60px;
+  }
+
+  .meter {
+    padding-top: 42px;
+  }
+
+  .track {
+    height: 28px;
+  }
+
+  .scale {
+    font-size: 12px;
+  }
+
+  .url {
+    font-size: 14px;
+  }
+
+  .miss {
+    gap: 12px;
+    padding: 12px 14px;
+  }
+  .miss p {
+    font-size: 14px;
+  }
+  .missPawny svg {
+    width: 56px;
+    height: 67px;
+  }
+
+  .legend {
+    font-size: 14px;
+  }
+
+  .tug::before {
+    display: none;
+  }
+
+  .rope {
+    display: block;
+    flex: none;
+    width: 4px;
+    margin: -7px 0;
+    background: var(--honey);
+    border-radius: 2px;
+  }
+}
