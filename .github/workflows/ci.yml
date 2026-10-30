@@ -12,7 +12,7 @@ permissions:
 env:
   # Which model in gs://pawnlink-tkgalon-models/pawnlink-lgbm/ gets served.
   # Promoting a model = changing this line.
-  MODEL_VERSION: "3"
+  MODEL_VERSION: "4"
   PROJECT_ID: pawnlink-tkgalon
   REGION: us-central1
   SERVICE: pawnlink-api
