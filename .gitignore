@@ -27,3 +27,6 @@ Notebook_DSCO.ipynb
 # Notebooks checkpoints & OS junk
 .ipynb_checkpoints/
 .DS_Store
+
+# Generated drift reports (HTML, several MB each)
+reports/drift/

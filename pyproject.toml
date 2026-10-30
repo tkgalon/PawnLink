@@ -27,6 +27,10 @@ dev = [
     "pytest>=9.1.1",
     "ruff>=0.17.2",
 ]
+monitor = [
+    "evidently>=0.7.23",
+    "google-cloud-bigquery>=3.47.0",
+]
 train = [
     "mlflow>=3.17.0",
     "pandas>=3.0.6",
@@ -34,8 +38,8 @@ train = [
 ]
 
 [tool.uv]
-# Local dev needs the training stack too; the API image installs neither group.
-default-groups = ["dev", "train"]
+# Local dev needs the training and monitoring stacks too; the API image installs none of them.
+default-groups = ["dev", "train", "monitor"]
 
 [tool.ruff]
 line-length = 100
