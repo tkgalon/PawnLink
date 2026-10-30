@@ -1,0 +1,151 @@
+.section {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 48px;
+  align-items: center;
+}
+
+.side {
+  flex: 1 1 280px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 44px;
+  line-height: 1.05;
+}
+
+.lead {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.55;
+  font-weight: 600;
+}
+
+.cta {
+  align-self: flex-start;
+  text-decoration: none;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 19px;
+  background: var(--lime);
+  border: var(--line) solid var(--ink);
+  border-radius: 16px;
+  padding: 12px 22px;
+  box-shadow: 0 var(--lip) 0 var(--ink);
+}
+
+/* Lined school paper, slightly askew. */
+.card {
+  flex: 999 1 520px;
+  min-width: 0;
+  margin: 0;
+  background: var(--white);
+  background-image: repeating-linear-gradient(var(--white) 0 47px, var(--sky-tint) 47px 49px);
+  border: var(--line) solid var(--ink);
+  border-radius: 24px;
+  padding: 28px 32px;
+  transform: rotate(-1deg);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  row-gap: 22px;
+  column-gap: 24px;
+  align-items: center;
+}
+
+.row {
+  display: contents;
+}
+
+.label {
+  display: flex;
+  flex-direction: column;
+}
+
+.rowTitle {
+  font-weight: 800;
+  font-size: 17px;
+}
+
+.rowNote {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.value {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 34px;
+}
+.risk,
+.safe {
+  border-radius: 12px;
+  padding: 0 10px;
+}
+.risk {
+  background: var(--coral);
+}
+.safe {
+  background: var(--lime);
+}
+
+@media (max-width: 640px) {
+  .section {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    gap: 22px;
+  }
+
+  /* Heading and text first, then the card, then the button. */
+  .side {
+    display: contents;
+  }
+
+  .title {
+    font-size: 34px;
+  }
+
+  .lead {
+    margin-top: -12px;
+    font-size: 16px;
+  }
+
+  .card {
+    flex: none;
+    padding: 20px 18px;
+    border-radius: 22px;
+    row-gap: 20px;
+    column-gap: 14px;
+  }
+
+  .cta {
+    order: 1;
+    align-self: stretch;
+    text-align: center;
+    padding: 14px 22px;
+  }
+
+  .rowTitle {
+    font-size: 15px;
+  }
+
+  .rowNote {
+    font-size: 13px;
+  }
+
+  .value {
+    font-size: 28px;
+  }
+  .risk,
+  .safe {
+    border-radius: 10px;
+    padding: 0 8px;
+  }
+}
