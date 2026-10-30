@@ -1,10 +1,3 @@
-"""Train the LightGBM model on the fixed splits and log the run to MLflow.
-
-Run with: uv run python -m pawnlink.training.train
-Prerequisite: uv run python -m pawnlink.training.data
-View runs:    uv run mlflow ui --backend-store-uri sqlite:///mlflow.db
-"""
-
 import argparse
 import hashlib
 import subprocess

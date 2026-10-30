@@ -1,8 +1,3 @@
-"""Usage: uv run python -m pawnlink.training.export [--version N]
-
-Writes models/model.txt and models/metadata.json for the API.
-"""
-
 import argparse
 import json
 from pathlib import Path

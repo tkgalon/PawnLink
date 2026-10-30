@@ -1,9 +1,3 @@
-"""Lexical features computed from a raw URL string.
-
-This module is the single source of truth for features: training applies
-`extract_features` to every row, and the API calls it on each request.
-"""
-
 import ipaddress
 import math
 import posixpath

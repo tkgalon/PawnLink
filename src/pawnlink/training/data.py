@@ -1,8 +1,3 @@
-"""Turn the raw competition CSV into fixed train/validation/test splits.
-
-Run with: uv run python -m pawnlink.training.data
-"""
-
 from pathlib import Path
 
 import pandas as pd
