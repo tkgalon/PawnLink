@@ -9,9 +9,11 @@ from fastapi import FastAPI, Header, HTTPException, Request, Response
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field, StringConstraints, TypeAdapter, ValidationError
 
+from pawnlink.api.anatomy import url_parts
 from pawnlink.api.model import PhishingModel
 from pawnlink.api.prediction_log import log_predictions
 from pawnlink.api.pubsub import decode_url, verify_push_token
+from pawnlink.api.stats import StatsCache
 
 MAX_BATCH = 100
 DEMO_PAGE = (Path(__file__).parent / "static" / "index.html").read_text()
@@ -43,9 +45,23 @@ class Prediction(BaseModel):
     is_phishing: bool
 
 
+class Reason(BaseModel):
+    feature: str
+    value: float
+    contribution: float  # SHAP value in log odds; positive pushes toward phishing
+
+
+class UrlPart(BaseModel):
+    text: str
+    kind: str
+
+
 class PredictResponse(Prediction):
     model_version: str
+    threshold: float
     latency_ms: float
+    reasons: list[Reason] | None = None
+    parts: list[UrlPart] | None = None
 
 
 class BatchResponse(BaseModel):
@@ -57,6 +73,7 @@ class BatchResponse(BaseModel):
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     app.state.model = PhishingModel.load(Path(os.environ.get("MODEL_DIR", "models")))
+    app.state.stats = StatsCache()
     yield
 
 
@@ -81,16 +98,29 @@ def health(request: Request) -> dict:
 
 
 @app.post("/predict")
-def predict(body: PredictRequest, request: Request) -> PredictResponse:
+def predict(body: PredictRequest, request: Request, explain: bool = False) -> PredictResponse:
     start = time.perf_counter()
     model = request.app.state.model
     [prediction] = _predict(model, [body.url])
     log_predictions([prediction], model.version, "predict")
+    extra = {"reasons": model.explain(body.url), "parts": url_parts(body.url)} if explain else {}
     return PredictResponse(
         **prediction.model_dump(),
         model_version=model.version,
+        threshold=model.threshold,
         latency_ms=(time.perf_counter() - start) * 1000,
+        **extra,
     )
+
+
+@app.get("/api/stats")
+def stats(request: Request) -> dict:
+    try:
+        data = request.app.state.stats.get()
+    except Exception as e:
+        # Stats are a nice-to-have: the scanner keeps working when BigQuery is unreachable.
+        raise HTTPException(status_code=503, detail="stats unavailable") from e
+    return data | {"model_version": request.app.state.model.version}
 
 
 @app.post("/predict/batch")

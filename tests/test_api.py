@@ -9,6 +9,7 @@ from fastapi.testclient import TestClient
 
 from pawnlink.api.main import MAX_BATCH, app
 from pawnlink.api.model import PhishingModel
+from pawnlink.api.model import _matrix as model_matrix
 from pawnlink.features.extract import FEATURE_NAMES
 
 
@@ -169,3 +170,42 @@ def test_pubsub_acks_bad_message_without_scoring(pubsub, capsys):
     assert _push(pubsub, "not base64!!").status_code == 204
     records = _logged(capsys)
     assert [r["event"] for r in records] == ["pubsub_bad_message", "pubsub_bad_message"]
+
+
+def test_predict_without_explain_has_no_reasons(client):
+    body = client.post("/predict", json={"url": "https://a.com/x"}).json()
+    assert body["threshold"] == 0.5
+    assert body["reasons"] is None and body["parts"] is None
+
+
+def test_predict_explain_adds_reasons_and_parts(client):
+    url = "https://mu.qmmafe.com/"
+    body = client.post("/predict?explain=true", json={"url": url}).json()
+    assert "".join(p["text"] for p in body["parts"]) == url
+    assert 1 <= len(body["reasons"]) <= 5
+    assert {"feature", "value", "contribution"} <= body["reasons"][0].keys()
+    sizes = [abs(r["contribution"]) for r in body["reasons"]]
+    assert sizes == sorted(sizes, reverse=True)
+
+
+def test_shap_contributions_add_up_to_the_score(tmp_path):
+    _write_model(tmp_path)
+    model = PhishingModel.load(tmp_path)
+    url = "http://paypal-verify.xyz/login"
+    reasons = model.explain(url, top=len(FEATURE_NAMES))
+    raw = model.booster.predict(model_matrix([url]), raw_score=True)[0]
+    base = model.booster.predict(model_matrix([url]), pred_contrib=True)[0][-1]
+    assert abs(sum(r["contribution"] for r in reasons) + base - raw) < 1e-6
+
+
+def test_stats_endpoint_returns_503_when_bigquery_fails(client):
+    def boom():
+        raise RuntimeError("no credentials")
+
+    client.app.state.stats._fetch = boom
+    assert client.get("/api/stats").status_code == 503
+
+
+def test_stats_endpoint_adds_model_version(client):
+    client.app.state.stats._fetch = lambda: {"months": []}
+    assert client.get("/api/stats").json() == {"months": [], "model_version": "test"}
