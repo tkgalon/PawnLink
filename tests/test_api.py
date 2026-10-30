@@ -1,8 +1,10 @@
+import base64
 import json
 
 import lightgbm as lgb
 import numpy as np
 import pytest
+from fastapi import HTTPException
 from fastapi.testclient import TestClient
 
 from pawnlink.api.main import MAX_BATCH, app
@@ -118,3 +120,52 @@ def test_invalid_request_is_not_logged(client, capsys):
     capsys.readouterr()
     client.post("/predict", json={"url": ""})
     assert _logged(capsys) == []
+
+
+def _push(client, data, token="Bearer good"):
+    return client.post(
+        "/pubsub/predict",
+        json={"message": {"data": data, "messageId": "m1"}, "subscription": "s"},
+        headers={"Authorization": token},
+    )
+
+
+@pytest.fixture
+def pubsub(client, monkeypatch):
+    monkeypatch.setenv("PUBSUB_AUDIENCE", "https://example.test/pubsub/predict")
+    monkeypatch.setenv("PUBSUB_PUSH_SA", "push@example.iam.gserviceaccount.com")
+
+    def fake_verify(authorization, audience, service_account):
+        if authorization != "Bearer good":
+            raise HTTPException(status_code=401)
+
+    monkeypatch.setattr("pawnlink.api.main.verify_push_token", fake_verify)
+    return client
+
+
+def _b64(text):
+    return base64.b64encode(text.encode()).decode()
+
+
+def test_pubsub_is_off_without_config(client):
+    assert _push(client, _b64("https://a.com")).status_code == 404
+
+
+def test_pubsub_rejects_bad_token(pubsub):
+    assert _push(pubsub, _b64("https://a.com"), token="Bearer forged").status_code == 401
+
+
+def test_pubsub_scores_and_logs_as_stream(pubsub, capsys):
+    capsys.readouterr()
+    assert _push(pubsub, _b64('{"url": "https://a.com/login"}')).status_code == 204
+    [record] = _logged(capsys)
+    assert record["endpoint"] == "stream"
+    assert record["url"] == "https://a.com/login"
+
+
+def test_pubsub_acks_bad_message_without_scoring(pubsub, capsys):
+    capsys.readouterr()
+    assert _push(pubsub, _b64("")).status_code == 204
+    assert _push(pubsub, "not base64!!").status_code == 204
+    records = _logged(capsys)
+    assert [r["event"] for r in records] == ["pubsub_bad_message", "pubsub_bad_message"]

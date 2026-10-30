@@ -2801,7 +2801,9 @@ source = { editable = "." }
 default-groups = ["dev", "monitor", "train"]
 dependencies = [
     { name = "fastapi" },
+    { name = "google-auth" },
     { name = "lightgbm" },
+    { name = "requests" },
     { name = "tldextract" },
     { name = "uvicorn", extra = ["standard"] },
 ]
@@ -2826,7 +2828,9 @@ train = [
 [package.metadata]
 requires-dist = [
     { name = "fastapi", specifier = ">=0.143.0" },
+    { name = "google-auth", specifier = ">=2.61.0" },
     { name = "lightgbm", specifier = ">=4.7.0" },
+    { name = "requests", specifier = ">=2.34.2" },
     { name = "tldextract", specifier = ">=5.4.0" },
     { name = "uvicorn", extras = ["standard"], specifier = ">=0.54.0" },
 ]

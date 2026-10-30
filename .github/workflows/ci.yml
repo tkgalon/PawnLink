@@ -16,6 +16,7 @@ env:
   PROJECT_ID: pawnlink-tkgalon
   REGION: us-central1
   SERVICE: pawnlink-api
+  SERVICE_URL: https://pawnlink-api-k6loc243yq-uc.a.run.app
   IMAGE: us-central1-docker.pkg.dev/pawnlink-tkgalon/pawnlink/api
   JOB: pawnlink-monthly
   JOB_IMAGE: us-central1-docker.pkg.dev/pawnlink-tkgalon/pawnlink/job
@@ -115,6 +116,7 @@ jobs:
             --max-instances 1 \
             --memory 512Mi \
             --cpu 1 \
+            --set-env-vars "PUBSUB_AUDIENCE=$SERVICE_URL/pubsub/predict,PUBSUB_PUSH_SA=pawnlink-pubsub@$PROJECT_ID.iam.gserviceaccount.com" \
             --labels "app=pawnlink,commit=$GITHUB_SHA"
 
       - name: Smoke test Cloud Run
