@@ -38,3 +38,4 @@ frontend/dist/
 frontend/tests/e2e/.results/
 frontend/tests/e2e/.captures/
 frontend/playwright-report/
+frontend/tests/reference/
