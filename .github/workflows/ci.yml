@@ -9,6 +9,15 @@ on:
 permissions:
   contents: read
 
+env:
+  # Which model in gs://pawnlink-tkgalon-models/pawnlink-lgbm/ gets served.
+  # Promoting a model = changing this line.
+  MODEL_VERSION: "3"
+  PROJECT_ID: pawnlink-tkgalon
+  REGION: us-central1
+  SERVICE: pawnlink-api
+  IMAGE: us-central1-docker.pkg.dev/pawnlink-tkgalon/pawnlink/api
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -43,7 +52,7 @@ jobs:
           version: "0.12.24"
           enable-cache: true
 
-      # models/ is gitignored; until the real model comes from GCS, build with a dummy.
+      # models/ is gitignored; this job builds with a dummy, deploy pulls the real one from GCS.
       - name: Create dummy model
         run: uv run --frozen --no-default-groups python scripts/make_dummy_model.py models
 
@@ -53,15 +62,57 @@ jobs:
       - name: Smoke test
         run: |
           docker run -d --name api -p 8080:8080 pawnlink:ci
-          for i in $(seq 1 30); do
-            curl -sf http://127.0.0.1:8080/health && break
-            sleep 1
-          done
-          curl -sf http://127.0.0.1:8080/health
-          curl -sf -X POST http://127.0.0.1:8080/predict \
-            -H 'Content-Type: application/json' \
-            -d '{"url": "http://1.2.3.4/x.exe"}'
+          scripts/smoke_test.sh http://127.0.0.1:8080 dummy
 
       - name: Container logs
         if: failure()
         run: docker logs api
+
+  deploy:
+    needs: docker
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write  # lets the job ask GitHub for the OIDC token that WIF checks
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: projects/1011340670287/locations/global/workloadIdentityPools/github/providers/pawnlink-repo
+          service_account: github-deployer@pawnlink-tkgalon.iam.gserviceaccount.com
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - name: Download model
+        run: |
+          mkdir -p models
+          gcloud storage cp "gs://pawnlink-tkgalon-models/pawnlink-lgbm/v$MODEL_VERSION/*" models/
+
+      - name: Build and push image
+        run: |
+          gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
+          docker build -t "$IMAGE:$GITHUB_SHA" .
+          docker push "$IMAGE:$GITHUB_SHA"
+
+      # max-instances=1 caps the bill even under a traffic spike; min-instances=0 means
+      # nothing runs (or costs) while nobody is calling the API.
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy "$SERVICE" \
+            --image "$IMAGE:$GITHUB_SHA" \
+            --project "$PROJECT_ID" \
+            --region "$REGION" \
+            --service-account "pawnlink-api@$PROJECT_ID.iam.gserviceaccount.com" \
+            --allow-unauthenticated \
+            --min-instances 0 \
+            --max-instances 1 \
+            --memory 512Mi \
+            --cpu 1 \
+            --labels "app=pawnlink,commit=$GITHUB_SHA"
+
+      - name: Smoke test Cloud Run
+        run: |
+          url=$(gcloud run services describe "$SERVICE" --region "$REGION" --format 'value(status.url)')
+          scripts/smoke_test.sh "$url" "$MODEL_VERSION"
