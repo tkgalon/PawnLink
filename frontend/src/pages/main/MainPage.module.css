@@ -1,0 +1,23 @@
+.main {
+  max-width: var(--page);
+  margin: 0 auto;
+  padding: 0 24px 96px;
+  display: flex;
+  flex-direction: column;
+  gap: 104px;
+}
+
+/* Without a scan result the first section would sit right under the board. */
+.main > :first-child:not(section[aria-live]) {
+  margin-top: 104px;
+}
+
+@media (max-width: 640px) {
+  .main {
+    padding: 0 16px 72px;
+    gap: 72px;
+  }
+  .main > :first-child:not(section[aria-live]) {
+    margin-top: 72px;
+  }
+}

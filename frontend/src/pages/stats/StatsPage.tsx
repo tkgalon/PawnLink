@@ -1,11 +1,12 @@
-import { Footer } from "../../components/Footer/Footer";
-import { Navbar } from "../../components/Navbar/Navbar";
-import { Pawny } from "../../components/Pawny/Pawny";
+import { Footer } from "@/components/Footer/Footer";
+import { Navbar } from "@/components/Navbar/Navbar";
+import { Pawny } from "@/components/Pawny/Pawny";
 
 export function StatsPage() {
   return (
     <>
       <Navbar
+        tight
         links={[
           { href: "/", label: "Try a link" },
           { href: "/stats/", label: "Check-up", current: true },

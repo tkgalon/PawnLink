@@ -55,3 +55,75 @@
   padding: 8px 16px;
   box-shadow: 0 4px 0 var(--ink);
 }
+
+.logoPawny {
+  display: flex;
+}
+
+@media (max-width: 640px) {
+  .nav {
+    flex-wrap: nowrap;
+    padding: 12px 16px;
+    gap: 12px;
+  }
+
+  .logo {
+    gap: 6px;
+    font-size: 24px;
+  }
+  .logoPawny svg {
+    width: 30px;
+    height: 36px;
+  }
+
+  .links {
+    flex-wrap: nowrap;
+    gap: 14px;
+    font-size: 15px;
+    white-space: nowrap;
+  }
+
+  .github {
+    border-radius: 12px;
+    padding: 7px 12px;
+  }
+
+  .hideOnMobile {
+    display: none;
+  }
+
+  .tight .logo {
+    font-size: 22px;
+  }
+  .tight .logoPawny svg {
+    width: 28px;
+    height: 34px;
+  }
+  .tight .links {
+    gap: 10px;
+    font-size: 13px;
+  }
+  .tight .github {
+    border-radius: 11px;
+    padding: 5px 9px;
+  }
+}
+
+/* Small phones (320 to 360px) get the tight sizes on every page. */
+@media (max-width: 360px) {
+  .logo {
+    font-size: 22px;
+  }
+  .logoPawny svg {
+    width: 28px;
+    height: 34px;
+  }
+  .links {
+    gap: 10px;
+    font-size: 13px;
+  }
+  .github {
+    border-radius: 11px;
+    padding: 5px 9px;
+  }
+}
