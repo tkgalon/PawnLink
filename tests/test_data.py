@@ -1,6 +1,6 @@
 import pandas as pd
 
-from pawnlink.training.data import add_target, deduplicate, split
+from pawnlink.training.data import add_target, deduplicate, split, split_by_domain
 
 
 def test_deduplicate_keeps_phishing_on_label_conflict():
@@ -38,3 +38,18 @@ def test_split_has_no_url_overlap_and_covers_all_rows():
 def test_split_is_reproducible():
     df = _toy()
     assert split(df)["test"]["url"].tolist() == split(df)["test"]["url"].tolist()
+
+
+def test_split_by_domain_keeps_domains_apart():
+    df = pd.DataFrame(
+        {
+            "url": [f"https://d{i % 40}.com/p{i}" for i in range(400)],
+            "domain": [f"d{i % 40}.com" for i in range(400)],
+        }
+    )
+    parts = split_by_domain(df)
+    domains = {name: set(p["domain"]) for name, p in parts.items()}
+    assert sum(len(p) for p in parts.values()) == len(df)
+    assert not domains["train"] & domains["val"]
+    assert not domains["train"] & domains["legit_paths_test"]
+    assert not domains["val"] & domains["legit_paths_test"]

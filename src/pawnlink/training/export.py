@@ -13,7 +13,7 @@ MODEL_DIR = Path("models")
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--version", help="registry version, default: latest")
+    parser.add_argument("--version", help="registry version, default: @champion")
     args = parser.parse_args()
 
     mlflow.set_tracking_uri(TRACKING_URI)
@@ -21,7 +21,7 @@ def main() -> None:
     if args.version:
         mv = client.get_model_version(MODEL_NAME, args.version)
     else:
-        mv = max(client.search_model_versions(f"name='{MODEL_NAME}'"), key=lambda m: int(m.version))
+        mv = client.get_model_version_by_alias(MODEL_NAME, "champion")
     run = client.get_run(mv.run_id)
 
     if "threshold" not in run.data.metrics:

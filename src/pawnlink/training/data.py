@@ -1,9 +1,12 @@
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
 RAW_PATH = Path("data/raw/train.csv")
+# Legit URLs with paths from Tranco + Common Crawl (scripts/fetch_legit_urls.py).
+EXTERNAL_PATH = Path("data/external/legit_paths.csv")
 PROCESSED_DIR = Path("data/processed")
 SEED = 42
 VAL_SIZE = 0.15
@@ -44,12 +47,37 @@ def split(df: pd.DataFrame) -> dict[str, pd.DataFrame]:
     return {"train": train, "val": val, "test": test}
 
 
+def split_by_domain(df: pd.DataFrame) -> dict[str, pd.DataFrame]:
+    """70/15/15 by domain, so evaluation domains are never seen in training."""
+    domains = np.array(sorted(df["domain"].unique()))
+    np.random.default_rng(SEED).shuffle(domains)
+    n_test, n_val = int(len(domains) * TEST_SIZE), int(len(domains) * VAL_SIZE)
+    groups = {
+        "legit_paths_test": domains[:n_test],
+        "val": domains[n_test : n_test + n_val],
+        "train": domains[n_test + n_val :],
+    }
+    return {name: df[df["domain"].isin(d)] for name, d in groups.items()}
+
+
+def load_external(known_urls: set[str], path: Path = EXTERNAL_PATH) -> pd.DataFrame:
+    df = pd.read_csv(path, usecols=["url", "domain"])
+    df = df[~df["url"].isin(known_urls)].drop_duplicates("url")
+    return df.assign(is_phishing=0)
+
+
 def main() -> None:
     df = add_target(deduplicate(load_raw()))
+    parts = split(df)
+    if EXTERNAL_PATH.exists():
+        external = split_by_domain(load_external(set(df["url"])))
+        for name, part in external.items():
+            part = part[["url", "is_phishing"]]
+            parts[name] = pd.concat([parts[name], part]) if name in parts else part
     PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
-    for name, part in split(df).items():
+    for name, part in parts.items():
         part.to_csv(PROCESSED_DIR / f"{name}.csv", index=False)
-        print(f"{name:5s} {len(part):6d} rows, phishing {part['is_phishing'].mean():.1%}")
+        print(f"{name:16s} {len(part):6d} rows, phishing {part['is_phishing'].mean():.1%}")
 
 
 if __name__ == "__main__":

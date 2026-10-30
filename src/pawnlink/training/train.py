@@ -85,6 +85,7 @@ def main() -> None:
     X_train, y_train = load_split("train")
     X_val, y_val = load_split("val")
     X_test, y_test = load_split("test")
+    X_legit_paths, _ = load_split("legit_paths_test")
 
     mlflow.set_tracking_uri(TRACKING_URI)
     mlflow.set_experiment(EXPERIMENT)
@@ -92,7 +93,7 @@ def main() -> None:
     with mlflow.start_run():
         mlflow.set_tags(
             {f"data.{name}.sha256": file_sha256(PROCESSED_DIR / f"{name}.csv")
-             for name in ("train", "val", "test")}
+             for name in ("train", "val", "test", "legit_paths_test")}
             | {"git.dirty": str(dirty).lower()}
         )  # fmt: skip
         mlflow.log_params(PARAMS | {"num_features": len(FEATURE_NAMES)})
@@ -119,6 +120,8 @@ def main() -> None:
             "threshold": threshold,
             "test_precision": precision_score(y_test, test_pred),
             "test_recall": recall_score(y_test, test_pred),
+            # Share of unseen legit domains with paths flagged as phishing; v3's weak spot.
+            "legit_paths_fpr": float((booster.predict(X_legit_paths) >= threshold).mean()),
         }
         mlflow.log_metrics(metrics)
 
