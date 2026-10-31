@@ -1,0 +1,163 @@
+.history {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 32px;
+  align-items: flex-start;
+}
+
+.main {
+  flex: 999 1 560px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 28px;
+}
+
+.note {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  max-width: 620px;
+}
+
+.tableBox {
+  overflow-x: auto;
+  border: var(--line) solid var(--ink);
+  border-radius: 20px;
+  background: var(--white);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 16px;
+  min-width: 520px;
+}
+
+.table thead tr {
+  background: var(--ink);
+  color: var(--cream);
+  text-align: left;
+}
+
+.table thead th {
+  padding: 14px 18px;
+  font-family: var(--font-display);
+  font-weight: 600;
+}
+.table thead th:not(:first-child) {
+  text-align: right;
+}
+
+.table tbody {
+  font-family: var(--font-mono);
+  font-weight: 500;
+}
+
+.table tbody th,
+.table tbody td {
+  padding: 16px 18px;
+  border-bottom: 2px solid var(--rule);
+}
+.table tbody tr:last-child th,
+.table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.table tbody th {
+  font-family: var(--font-body);
+  font-weight: 800;
+  text-align: left;
+}
+
+.table tbody td {
+  text-align: right;
+}
+
+.worse,
+.better {
+  border-radius: 8px;
+  padding: 2px 8px;
+}
+.worse {
+  background: var(--brick-path);
+}
+.better {
+  background: var(--brick-query);
+  font-weight: 700;
+}
+
+.facts {
+  flex: 1 1 300px;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  padding-top: 56px;
+}
+
+.facts > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.facts > div:not(:last-child) {
+  padding-bottom: 18px;
+  border-bottom: 2px dashed var(--muted-line);
+}
+
+.facts dt {
+  font-weight: 800;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.facts dd {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+@media (max-width: 640px) {
+  .history {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+  }
+
+  .main {
+    flex: none;
+  }
+
+  .title {
+    font-size: 24px;
+  }
+
+  .table {
+    font-size: 14px;
+    min-width: 0;
+  }
+
+  .table thead th {
+    padding: 12px;
+  }
+
+  .table tbody th,
+  .table tbody td {
+    padding: 13px 12px;
+  }
+
+  .facts {
+    flex: none;
+    padding-top: 0;
+  }
+}
