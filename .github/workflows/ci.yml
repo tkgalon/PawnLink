@@ -150,6 +150,13 @@ jobs:
           url=$(gcloud run services describe "$SERVICE" --region "$REGION" --format 'value(status.url)')
           scripts/smoke_test.sh "$url" "$MODEL_VERSION"
 
+      # pawnlink.web.app is only a front door: Firebase Hosting forwards every request
+      # to the Cloud Run service, so this deploy changes routing, never the app itself.
+      - name: Deploy Firebase Hosting
+        run: |
+          npx --yes firebase-tools@15.34.0 deploy --only hosting --project "$PROJECT_ID" --non-interactive
+          scripts/smoke_test.sh https://pawnlink.web.app "$MODEL_VERSION"
+
       # Only updates the job definition; Cloud Scheduler runs it on the 1st of each month.
       - name: Deploy monthly job
         run: |
