@@ -60,6 +60,10 @@
   display: flex;
 }
 
+.tight .logo {
+  letter-spacing: normal;
+}
+
 @media (max-width: 640px) {
   .nav {
     flex-wrap: nowrap;
@@ -125,5 +129,9 @@
   .github {
     border-radius: 11px;
     padding: 5px 9px;
+  }
+
+  .hideOnSmall {
+    display: none;
   }
 }

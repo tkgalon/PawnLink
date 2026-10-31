@@ -3,7 +3,14 @@ import styles from "./Navbar.module.css";
 
 export const GITHUB_URL = "https://github.com/tkgalon/PawnLink";
 
-type Link = { href: string; label: string; current?: boolean; hideOnMobile?: boolean };
+type Link = {
+  href: string;
+  label: string;
+  current?: boolean;
+  hideOnMobile?: boolean;
+  /** Hidden on phones narrower than 360px, where the logo is the way home. */
+  hideOnSmall?: boolean;
+};
 
 type Props = {
   links: Link[];
@@ -27,7 +34,7 @@ export function Navbar({ links, tight = false }: Props) {
               key={link.href}
               href={link.href}
               aria-current={link.current ? "page" : undefined}
-              className={`${link.current ? styles.current : styles.link} ${link.hideOnMobile ? styles.hideOnMobile : ""}`}
+              className={`${link.current ? styles.current : styles.link} ${link.hideOnMobile ? styles.hideOnMobile : ""} ${link.hideOnSmall ? styles.hideOnSmall : ""}`}
             >
               {link.label}
             </a>
