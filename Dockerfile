@@ -1,3 +1,15 @@
+# Site stage: build the React pages into static files.
+FROM node:22-slim AS site
+WORKDIR /site
+
+# Packages first so this layer is cached until package-lock.json changes.
+COPY frontend/package.json frontend/package-lock.json ./
+RUN npm ci
+
+COPY frontend ./
+RUN npx vite build
+
+
 # Build stage: resolve and install dependencies with uv.
 FROM python:3.11-slim AS builder
 COPY --from=ghcr.io/astral-sh/uv:0.12.24 /uv /bin/uv
@@ -21,7 +33,7 @@ COPY src ./src
 RUN uv sync --frozen --no-default-groups $UV_GROUPS --no-editable
 
 
-# Runtime stage: only the virtualenv and the model, no uv, no source tree.
+# Runtime stage: only the virtualenv, the model and the built site, no uv, no source tree.
 FROM python:3.11-slim
 
 # LightGBM needs OpenMP at runtime.
@@ -34,9 +46,11 @@ WORKDIR /app
 
 COPY --from=builder /app/.venv /app/.venv
 COPY models ./models
+COPY --from=site /site/dist ./web
 
 ENV PATH="/app/.venv/bin:$PATH" \
     MODEL_DIR=/app/models \
+    WEB_DIR=/app/web \
     PYTHONUNBUFFERED=1
 
 USER app

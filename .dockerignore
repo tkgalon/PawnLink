@@ -13,3 +13,7 @@ tests
 *.ipynb
 .env
 .DS_Store
+frontend/node_modules
+frontend/dist
+frontend/tests
+frontend/playwright-report
