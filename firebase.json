@@ -1,0 +1,12 @@
+{
+  "hosting": {
+    "site": "pawnlink",
+    "public": "infra/firebase-public",
+    "redirects": [
+      { "regex": "^/stats$", "destination": "/stats/", "type": 301 }
+    ],
+    "rewrites": [
+      { "source": "**", "run": { "serviceId": "pawnlink-api", "region": "us-central1" } }
+    ]
+  }
+}

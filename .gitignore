@@ -39,3 +39,7 @@ frontend/tests/e2e/.results/
 frontend/tests/e2e/.captures/
 frontend/playwright-report/
 frontend/tests/reference/
+
+# Firebase CLI
+.firebase/
+firebase-debug.log
