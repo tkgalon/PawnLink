@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Annotated
 
 from fastapi import FastAPI, Header, HTTPException, Request, Response
-from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, StringConstraints, TypeAdapter, ValidationError
 
 from pawnlink.api.anatomy import url_parts
@@ -16,7 +16,7 @@ from pawnlink.api.pubsub import decode_url, verify_push_token
 from pawnlink.api.stats import StatsCache
 
 MAX_BATCH = 100
-DEMO_PAGE = (Path(__file__).parent / "static" / "index.html").read_text()
+WEB_DIR = Path(os.environ.get("WEB_DIR", "frontend/dist"))
 
 Url = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=2048)]
 
@@ -85,11 +85,6 @@ def _predict(model: PhishingModel, urls: list[str]) -> list[Prediction]:
         Prediction(url=u, score=s, is_phishing=s >= model.threshold)
         for u, s in zip(urls, model.score(urls), strict=True)
     ]
-
-
-@app.get("/", response_class=HTMLResponse, include_in_schema=False)
-def demo() -> str:
-    return DEMO_PAGE
 
 
 @app.get("/health")
@@ -161,3 +156,9 @@ def pubsub_predict(
     model = request.app.state.model
     log_predictions(_predict(model, [url]), model.version, "stream")
     return Response(status_code=204)
+
+
+# Mounted last so every API route above wins. Skipped when the site is not built,
+# so the API still runs on its own.
+if WEB_DIR.is_dir():
+    app.mount("/", StaticFiles(directory=WEB_DIR, html=True), name="web")

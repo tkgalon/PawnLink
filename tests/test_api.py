@@ -38,11 +38,18 @@ def client(tmp_path, monkeypatch):
         yield c
 
 
-def test_demo_page(client):
-    resp = client.get("/")
+@pytest.mark.parametrize(("path", "text"), [("/", "main page"), ("/stats/", "stats page")])
+def test_site_pages(client, path, text):
+    resp = client.get(path)
     assert resp.status_code == 200
     assert "text/html" in resp.headers["content-type"]
-    assert "Pawn it" in resp.text
+    assert text in resp.text
+
+
+def test_site_does_not_shadow_the_api(client):
+    assert client.get("/health").json()["status"] == "ok"
+    assert client.get("/docs").status_code == 200
+    assert client.get("/nope").status_code == 404
 
 
 def test_health(client):
