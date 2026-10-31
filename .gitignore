@@ -43,3 +43,7 @@ frontend/tests/reference/
 # Firebase CLI
 .firebase/
 firebase-debug.log
+
+# Local demo recording tools
+scripts/record_*_demo.mjs
+scripts/render_*_demo.py
