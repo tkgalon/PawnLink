@@ -15,3 +15,16 @@ test("main page after appraising the paypal ticket", async ({ page }, info) => {
     scale: "css",
   });
 });
+
+test("stats page with live numbers", async ({ page }, info) => {
+  await page.goto("/stats/");
+  await page.evaluate(() => document.fonts.ready);
+  await expect(page.getByText("Last run 30 Oct 2026")).toBeVisible({ timeout: 15_000 });
+  await page.waitForTimeout(500);
+  await page.screenshot({
+    path: `tests/e2e/.captures/compare-${info.project.name}-stats.png`,
+    fullPage: true,
+    animations: "disabled",
+    scale: "css",
+  });
+});
